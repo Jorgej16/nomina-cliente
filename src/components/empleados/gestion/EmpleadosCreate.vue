@@ -17,7 +17,14 @@
                   <q-input
                     v-model="empleado.nombre"
                     :rules="[val => !!val || 'Campo requerido']"
-                    label="Nombre Y Apellido"
+                    label="Nombre"
+                  />
+                </div>
+                <div class="col">
+                  <q-input
+                    v-model="empleado.apellido"
+                    :rules="[val => !!val || 'Campo requerido']"
+                    label="Apellido"
                   />
                 </div>
                 <div class="col">
@@ -86,6 +93,7 @@ export default {
         empleado: {
             cedula: "",
             nombre: "",
+            apellido: "",
             Departamento: "",
             Salario: "",
             Puesto: "",
@@ -148,6 +156,7 @@ export default {
     cleamImpus() {
       this.modalCreate = false;
       this.empleado.nombre = "";
+      this.empleado.apellido = "";
       this.empleado.cedula = "";
       this.empleado.Departamento = "";
       this.empleado.Salario = "";
