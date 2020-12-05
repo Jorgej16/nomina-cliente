@@ -10,7 +10,7 @@ export default {
               <soap:Body>
                 <Crear_Empleado xmlns="https://github.com/alfredo00sd/">
                   <employee>
-                    <Nomina>${70}</Nomina>
+                    <Nomina>${14}</Nomina>
                     <Cedula>${empleado.cedula}</Cedula>
                     <DepartamentId>${22}</DepartamentId>
                     <Name>${empleado.nombre}</Name>
@@ -22,28 +22,32 @@ export default {
               </soap:Body>
             </soap:Envelope>`;
 
-    let response = await axios.post(`${Host}/${POST}?op=Crear_Empleado`, 
+    let response = await axios.post(`https://localhost:44350/GestionNomina.asmx`, 
                   xmls,
                   {headers:
-                    {'Content-Type': 'text/xml'}
-                  }).then(res=>{
-                    console.log(res);
-                  }).catch(err=>{console.log(err)});
+                    {'Content-Type': 'text/xml',
+                  'Accept': 'text/xml'}
+                  });
 
     return response;
   },
 
-  async getEmpleados(id) {
-    if (id) {
-    let response = await axios.get(`${destino}:${port}/v1/empleado/`+id)
+  async getEmpleados() {
+    let xmls=`<?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <Listar_Empleados xmlns="https://github.com/alfredo00sd/" />
+      </soap:Body>
+    </soap:Envelope>`;
 
-    return response.data.body;
-    }else{
-      
-    let response = await axios.get(`${destino}:${port}/v1/empleado/`)
+    let response = await axios.post(`https://localhost:44350/GestionNomina.asmx`, 
+                  xmls,
+                  {headers:
+                    {'Content-Type': 'text/xml',
+                  'Accept': 'text/xml'}
+                  });
 
-    return response.data.body;
-    }
+    return response;
   },
   
 }

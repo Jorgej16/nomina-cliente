@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <q-table title="EMPLEADOS" :data="data" :columns="columns" row-key="cedula" :filter="filter">
+    <q-table title="EMPLEADOS" :data="data" :columns="columns" row-key="Cedula" :filter="filter">
       <template v-slot:top-right>
         <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
           <template v-slot:append>
@@ -76,57 +76,65 @@
         <q-card-section class="q-pt-none">
           <q-form>
             <div class="q-gutter-md">
-              <div class="col">
-                <q-input
-                  v-model="CurrentEmpleado.nombre"
-                  :rules="[val => !!val || 'Campo requerido']"
-                  label="Nombre Y Apellido"
-                />
-              </div>
-              <div class="col">
-                <q-input
-                  v-model="CurrentEmpleado.cedula"
-                  :rules="[val => !!val || 'Campo requerido']"
-                  label="Numero de Cedula"
-                />
-              </div>
-              <div class="col">
+                <div class="col">
+                  <q-input
+                    v-model="CurrentEmpleado.nombre"
+                    :rules="[val => !!val || 'Campo requerido']"
+                    label="Nombre"
+                  />
+                </div>
+                <div class="col">
+                  <q-input
+                    v-model="CurrentEmpleado.apellido"
+                    :rules="[val => !!val || 'Campo requerido']"
+                    label="Apellido"
+                  />
+                </div>
+                <div class="col">
+                  <q-input
+                    v-model="CurrentEmpleado.cedula"
+                    :rules="[val => !!val || 'Campo requerido']"
+                    label="Numero de Cedula"
+                  />
+                </div>
+                <div class="col">
                 <q-select
                   :rules="[val => !!val || 'Campo requerido']"
-                  v-model="CurrentEmpleado.tanda"
-                  :options="tandas"
+                  v-model="CurrentEmpleado.Departamento"
+                  :options="Departamentos"
                   option-value="id"
-                  option-label="tanda"
-                  label="Tanda Laboral"
+                  option-label="Departamento"
+                  label="Departamento"
                 />
-              </div>
-              <div class="col">
-                <q-input
-                  :rules="[val => !!val || 'Campo requerido']"
-                  type="number"
-                  v-model="CurrentEmpleado.comision"
-                  label="Porciento Comision"
-                />
-              </div>
-              <div class="col">
-                <q-input
-                  :rules="[val => !!val || 'Campo requerido']"
-                  v-model="CurrentEmpleado.fechaIngreso"
-                  filled
-                  type="date"
-                  label="Fecha de Ingreso"
-                />
-              </div>
-              <div class="col">
-                <q-select
-                  :rules="[val => !!val || 'Campo requerido']"
-                  v-model="CurrentEmpleado.estado"
-                  :options="estados"
-                  option-value="id"
-                  option-label="name"
-                  label="Estado"
-                />
-              </div>
+                </div>
+                <div class="col">
+                  <q-input
+                    :rules="[val => !!val || 'Campo requerido']"
+                    type="number"
+                    v-model="CurrentEmpleado.Salario"
+                  label="Salario"
+                  />
+                </div>
+                <div class="col">
+                  <q-select
+                    :rules="[val => !!val || 'Campo requerido']"
+                    v-model="CurrentEmpleado.Puesto"
+                    :options="Puestos"
+                    option-value="id"
+                    option-label="Puesto"
+                    label="Puesto"
+                  />
+                </div>
+                <div class="col">
+                  <q-select
+                    :rules="[val => !!val || 'Campo requerido']"
+                    v-model="CurrentEmpleado.Nomina"
+                    :options="Nominas"
+                    option-value="id"
+                    option-label="Nomina"
+                    label="Nomina"
+                  />
+                </div>
             </div>
           </q-form>
 
@@ -142,54 +150,61 @@
 <script>
 import axios from "axios";
 import EmpleadosAPI from "../../../api/empleadosAPI";
+import Vue from 'vue';
+// import parser from 'xml2json';
+import x2js from 'x2js'; //xml data processing plugin
+Vue.prototype.$x2js = new x2js(); //Global method mount
 export default {
   data() {
     return {
       filter: "",
       columns: [
         {
-          name: "cedula",
+          name: "Cedula",
           align: "left",
           label: "Cedula",
-          field: "cedula",
+          field: "Cedula",
           sortable: true
         },
         {
-          name: "nombre",
+          name: "Name",
           required: true,
           label: "Nombre Y Apellido",
           align: "left",
-          field: row => row.nombre,
+          field: row => row.Name+' '+row.LastName,
           format: val => `${val}`,
           sortable: true
         },
         {
-          name: "Departamento",
+          name: "DepartamentId",
           align: "left",
           label: "Departamento",
-          field: "Departamento",
+          field: "DepartamentId",
           sortable: true
         },
         {
-          name: "Puesto",
+          name: "WorkPosition",
           align: "left",
           label: "Puesto",
-          field: "Puesto",
+          field: "WorkPosition",
           sortable: true
         },
         {
-          name: "Salario",
+          name: "Salary",
           align: "left",
           label: "Salario",
-          field: "Salario",
+          field: "Salary",
           sortable: true
         },
-        { name: "Nómina", label: "Nómina", field: "Nómina", 
+        { name: "Nomina", label: "Nomina", field: "Nomina", 
           align: "left", sortable: true }
       ],
       data: [],
       CurrentId: null,
       CurrentEmpleado: [],
+        Puestos: ["Ingeniero", "Auxiliar", "Gerente"],
+        Departamentos: ["Contabilidad", "RRHH", "Desarrollo"],
+        Nominas: ["Contabilidad"],
       modalUpdate: false,
     };
   },
@@ -198,7 +213,16 @@ export default {
   },
   methods: {
     async getEmpleados() {
-      this.data = await EmpleadosAPI.getEmpleados();
+      let hola = await EmpleadosAPI.getEmpleados();
+      console.log(hola);
+      this.convertXml2JSon(hola.data);
+    },
+    convertXml2JSon(xml) {
+      var jsonObjt = this.$x2js.xml2js(xml);//res (xml data)
+      let data = jsonObjt.Envelope.Body.Listar_EmpleadosResponse.Listar_EmpleadosResult.Employee;
+      this.data = data;
+      console.log(this.data);
+      // console.log(jsonObjt.Envelope.Body.Listar_EmpleadosResponse.Listar_EmpleadosResult); 
     },
     updateEmpleadoShow(empleado) {
       this.CurrentEmpleado = empleado;

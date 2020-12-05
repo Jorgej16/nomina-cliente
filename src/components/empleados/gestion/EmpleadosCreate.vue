@@ -116,10 +116,8 @@ export default {
     async saveEmpleado() {
       if (this.empleado) {
         await EmpleadosAPI.create(this.empleado).then(response => {
-          if (response.data.status == 0) {
-            this.triggerWarning();
-          }
-          if (response.data.status == 1) {
+          console.log("mi respuesta", response);
+          if (response.status == 200) {
             this.triggerPositive();
             setTimeout(this.loadOnce, 1000);
           } else {

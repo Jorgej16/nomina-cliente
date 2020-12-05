@@ -12,7 +12,9 @@
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.1",
     "core-js": "^3.6.5",
-    "quasar": "^1.0.0"
+    "quasar": "^1.0.0",
+    "x2js": "^3.4.0",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0"

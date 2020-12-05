@@ -5,9 +5,7 @@
         <EmpleadosCreate />
       </q-card-section>
     </q-card>
-    <q-card class="card">
         <EmpleadosList />
-    </q-card>
   </div>
 </template>
 
