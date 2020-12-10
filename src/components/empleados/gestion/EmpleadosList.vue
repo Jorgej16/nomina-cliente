@@ -78,21 +78,21 @@
             <div class="q-gutter-md">
                 <div class="col">
                   <q-input
-                    v-model="CurrentEmpleado.nombre"
+                    v-model="CurrentEmpleado.Name"
                     :rules="[val => !!val || 'Campo requerido']"
                     label="Nombre"
                   />
                 </div>
                 <div class="col">
                   <q-input
-                    v-model="CurrentEmpleado.apellido"
+                    v-model="CurrentEmpleado.LastName"
                     :rules="[val => !!val || 'Campo requerido']"
                     label="Apellido"
                   />
                 </div>
                 <div class="col">
                   <q-input
-                    v-model="CurrentEmpleado.cedula"
+                    v-model="CurrentEmpleado.Cedula"
                     :rules="[val => !!val || 'Campo requerido']"
                     label="Numero de Cedula"
                   />
@@ -100,7 +100,7 @@
                 <div class="col">
                 <q-select
                   :rules="[val => !!val || 'Campo requerido']"
-                  v-model="CurrentEmpleado.Departamento"
+                  v-model="CurrentEmpleado.DepartamentId"
                   :options="Departamentos"
                   option-value="id"
                   option-label="Departamento"
@@ -111,14 +111,14 @@
                   <q-input
                     :rules="[val => !!val || 'Campo requerido']"
                     type="number"
-                    v-model="CurrentEmpleado.Salario"
+                    v-model="CurrentEmpleado.Salary"
                   label="Salario"
                   />
                 </div>
                 <div class="col">
                   <q-select
                     :rules="[val => !!val || 'Campo requerido']"
-                    v-model="CurrentEmpleado.Puesto"
+                    v-model="CurrentEmpleado.WorkPosition"
                     :options="Puestos"
                     option-value="id"
                     option-label="Puesto"
@@ -232,16 +232,7 @@ export default {
     async updateEmpleado() {
       let empleado = this.CurrentEmpleado;
       if (empleado) {
-        await EmpleadosAPI.edit(empleado.id, {
-          body: {
-            nombre: empleado.nombre,
-            cedula: empleado.cedula,
-            tanda: empleado.tanda,
-            comision: empleado.comision,
-            fechaIngreso: empleado.fechaIngreso,
-            estado: empleado.estado
-          }
-        }).then(response => {
+        await EmpleadosAPI.edit(empleado.id, empleado).then(response => {
           if (response.data.status == 1) {
             this.$q.notify({
               type: "positive",

@@ -13,13 +13,6 @@
         label="NOMINA"
         icon="exit_to_app"
       >
-        <q-list>
-          <q-item to="login" clickable v-close-popup>
-            <q-item-section>
-              <q-item-label>Cerrar Sesión</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
       </q-btn-dropdown>
     </q-toolbar>
   </q-header>
