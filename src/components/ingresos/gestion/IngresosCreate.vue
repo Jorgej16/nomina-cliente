@@ -15,9 +15,16 @@
             <div class="q-gutter-md">
                 <div class="col">
                   <q-input
-                    v-model="ingreso.Nombre"
+                    v-model="ingreso.Title"
                     :rules="[val => !!val || 'Campo requerido']"
-                    label="Nombre"
+                    label="Titulo"
+                  />
+                </div>
+                <div class="col">
+                  <q-input
+                    v-model="ingreso.Description"
+                    :rules="[val => !!val || 'Campo requerido']"
+                    label="Description"
                   />
                 </div>
                 <div class="col">
@@ -25,20 +32,10 @@
                   :rules="[val => !!val || 'Campo requerido']"
                   v-model="ingreso.SalaryDependent"
                   :options="SalaryDependents"
-                  option-value="id"
-                  option-label="SalaryDependent"
+                  option-value="value"
+                  option-label="label"
                   label="Salary Dependent"
                 />
-                </div>
-                <div class="col">
-                  <q-select
-                    :rules="[val => !!val || 'Campo requerido']"
-                    v-model="ingreso.Estado"
-                    :options="Estados"
-                    option-value="id"
-                    option-label="Estado"
-                    label="Estado"
-                  />
                 </div>
             </div>
           </q-form>
@@ -54,17 +51,19 @@
 <script>
 import axios from "axios";
 import ingresosAPI from "../../../api/ingresosAPI";
+import Vue from 'vue';
+import x2js from 'x2js'; //xml data processing plugin
+Vue.prototype.$x2js = new x2js(); //Global method mount
 export default {
   components: {},
   data() {
     return {
         ingreso: {
-            Nombre: "",
+            Title: "",
+            Description: "",
             SalaryDependent: "",
-            Estado: "",
         },
-        Estados: ["Activo", "Inactivo"],
-        SalaryDependents: ["si", "no"],
+        SalaryDependents: [{label:"si", value:true}, {label: "no", value:false}],
         modalCreate: false,
         data: []
     };
@@ -74,15 +73,24 @@ export default {
   },
   methods: {
     async getTiposIngresos() {
-      this.data = await ingresosAPI.getTiposIngresos();
+      let hola = await ingresosAPI.getTiposIngresos();
+      this.convertXml2JSon(hola.data);
+    },
+    convertXml2JSon(xml) {
+      var jsonObjt = this.$x2js.xml2js(xml);//res (xml data)
+      // console.log(jsonObjt.Envelope.Body);
+      let data = jsonObjt.Envelope.Body.Listar_Ing_DedResponse.Listar_Ing_DedResult.EntryType;
+      
+      if (Array.isArray(data)) {
+        this.data = data;
+      }else{
+        this.data.push(data);
+      }
     },
     async saveingreso() {
       if (this.ingreso) {
         await ingresosAPI.create(this.ingreso).then(response => {
-          if (response.data.status == 0) {
-            this.triggerWarning();
-          }
-          if (response.data.status == 1) {
+          if (response.status == 200) {
             this.triggerPositive();
             setTimeout(this.loadOnce, 1000);
           } else {
@@ -118,9 +126,9 @@ export default {
     },
     cleamImpus() {
       this.modalCreate = false;
-      this.ingreso.Nombre = "";
+      this.ingreso.Title = "";
+      this.ingreso.Description = "";
       this.ingreso.SalaryDependent = "";
-      this.ingreso.Estado = "";
     },
     agregaringreso() {
       this.modalCreate = true;

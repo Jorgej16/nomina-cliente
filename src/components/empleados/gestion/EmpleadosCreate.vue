@@ -32,6 +32,16 @@
                     v-model="empleado.cedula"
                     :rules="[val => !!val || 'Campo requerido']"
                     label="Numero de Cedula"
+                    unmasked-value
+                    mask="###-#######-#"
+                  />
+                </div>
+                <div class="col">
+                  <q-input
+                    v-model="empleado.nomina"
+                    label="Numero de cuenta"
+                    mask="#####"
+                    :rules="[val => !!val || 'Campo requerido']"
                   />
                 </div>
                 <div class="col">
@@ -39,8 +49,8 @@
                   :rules="[val => !!val || 'Campo requerido']"
                   v-model="empleado.Departamento"
                   :options="Departamentos"
-                  option-value="id"
-                  option-label="Departamento"
+                  option-value="Id"
+                  option-label="Description"
                   label="Departamento"
                 />
                 </div>
@@ -62,16 +72,6 @@
                     label="Puesto"
                   />
                 </div>
-                <div class="col">
-                  <q-select
-                    :rules="[val => !!val || 'Campo requerido']"
-                    v-model="empleado.Nómina"
-                    :options="Nominas"
-                    option-value="id"
-                    option-label="Nómina"
-                    label="Nómina"
-                  />
-                </div>
             </div>
           </q-form>
 
@@ -86,6 +86,9 @@
 <script>
 import axios from "axios";
 import EmpleadosAPI from "../../../api/empleadosAPI";
+import Vue from 'vue';
+import x2js from 'x2js'; //xml data processing plugin
+Vue.prototype.$x2js = new x2js(); //Global method mount
 export default {
   components: {},
   data() {
@@ -97,10 +100,10 @@ export default {
             Departamento: "",
             Salario: "",
             Puesto: "",
-            Nómina: ""
+            nomina: ""
         },
         Puestos: ["Ingeniero", "Auxiliar", "Gerente"],
-        Departamentos: ["Contabilidad", "RRHH", "Desarrollo"],
+        Departamentos: [],
         Nominas: ["Contabilidad"],
         modalCreate: false,
         data: []
@@ -108,12 +111,28 @@ export default {
   },
   async created() {
     this.getEmpleados();
+    this.getDepartamentos();
   },
   methods: {
     async getEmpleados() {
       this.data = await EmpleadosAPI.getEmpleados();
     },
+    async getDepartamentos() {
+      let empleados = await EmpleadosAPI.getDepartamentos();
+      this.convertXml2JSon(empleados.data);
+    },
+    convertXml2JSon(xml) {
+      var jsonObjt = this.$x2js.xml2js(xml);//res (xml data)
+      let data = jsonObjt.Envelope.Body.Listar_DepartamentosResponse.Listar_DepartamentosResult.EmployeeDepartment;
+     
+      if (Array.isArray(data)) {
+        this.Departamentos = data;
+      }else{
+        this.Departamentos.push(data);
+      }
+    },
     async saveEmpleado() {
+      console.log(this.empleado);
       if (this.empleado) {
         await EmpleadosAPI.create(this.empleado).then(response => {
           console.log("mi respuesta", response);

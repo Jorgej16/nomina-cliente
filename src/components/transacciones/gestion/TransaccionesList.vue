@@ -11,44 +11,12 @@
       <template v-slot:header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
-          <q-th auto-width>Accion</q-th>
         </q-tr>
       </template>
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">{{ col.value }}</q-td>
-          <q-td auto-width>
-            <q-btn
-              size="sm"
-              color="teal"
-              round
-              dense
-              @click="props.expand = !props.expand"
-              :icon="props.expand ? 'remove' : 'add'"
-            />
-          </q-td>
-        </q-tr>
-        <q-tr v-show="props.expand" :props="props">
-          <q-td colspan="100%">
-            <div class="text-right">
-              <q-btn
-                size="sm"
-                color="orange"
-                round
-                dense
-                :icon="'edit'"
-                @click="updateTransaccionesShow(props.row)"
-              />
-              <q-btn
-                size="sm"
-                color="red"
-                round
-                dense
-                :icon="'delete'"
-                @click="deleteTransaccion(props.row.id)"
-              />
-            </div>
-          </q-td>
+         
         </q-tr>
       </template>
     </q-table>
@@ -157,6 +125,9 @@
 <script>
 import axios from "axios";
 import TransaccionAPI from "../../../api/transaccionAPI";
+import Vue from 'vue';
+import x2js from 'x2js'; //xml data processing plugin
+Vue.prototype.$x2js = new x2js(); //Global method mount
 export default {
   data() {
     return {
@@ -169,48 +140,48 @@ export default {
         estados: ["activo", "inactivo"],
       columns: [
         {
-          name: "empleado",
+          name: "Cedula",
           align: "left",
-          label: "Empleado",
-          field: "empleado",
+          label: "Cedula",
+          field: "Cedula",
           sortable: true
         },
         {
-          name: "ingreso",
+          name: "EntryDetails",
           align: "left",
           label: "Ingreso",
-          field: "ingreso",
+          field: "EntryDetails",
           sortable: true
         },
         {
-          name: "deduccion",
+          name: "DeductionDetails",
           align: "left",
           label: "Deduccion",
-          field: "deduccion",
+          field: "DeductionDetails",
           sortable: true
         },
         {
-          name: "tipo",
+          name: "TranscType",
           align: "left",
           label: "Tipo",
-          field: "tipo",
+          field: "TranscType",
           sortable: true
         },
         {
-          name: "monto",
+          name: "Amount",
           align: "left",
           label: "Monto",
-          field: "monto",
+          field: "Amount",
           sortable: true
         },
         {
-          name: "fecha",
+          name: "Date",
           align: "left",
           label: "Fecha",
-          field: "fecha",
+          field: "Date",
           sortable: true
         },
-        { name: "estado", label: "Estado", field: "estado", 
+        { name: "State", label: "Estado", field: "State", 
           align: "left", sortable: true }
       ],
       data: [],
@@ -224,7 +195,19 @@ export default {
   },
   methods: {
     async getTransacciones() {
-      this.data = await TransaccionAPI.getTransacciones();
+      let hola = await TransaccionAPI.getTransacciones();
+      this.convertXml2JSon(hola.data);
+    },
+    convertXml2JSon(xml) {
+      var jsonObjt = this.$x2js.xml2js(xml);//res (xml data)
+      let data = jsonObjt.Envelope.Body.Consultar_transaccionesResponse.Consultar_transaccionesResult.TransaccionLog;
+      
+      if (Array.isArray(data)) {
+        this.data = data;
+      }else{
+        this.data.push(data);
+      }
+      console.log(this.data);
     },
     updateTransaccionesShow(transaccion) {
       this.CurrentTransaccion = transaccion;

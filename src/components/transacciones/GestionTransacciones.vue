@@ -5,9 +5,7 @@
         <TransaccionesCreate />
       </q-card-section>
     </q-card>
-    <q-card class="card">
         <TransaccionesList />
-    </q-card>
   </div>
 </template>
 

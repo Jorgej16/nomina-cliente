@@ -15,9 +15,24 @@
             <div class="q-gutter-md">
                 <div class="col">
                   <q-input
-                    v-model="deducion.Nombre"
+                    v-model="deducion.Title"
                     :rules="[val => !!val || 'Campo requerido']"
-                    label="Nombre"
+                    label="Titulo"
+                  />
+                </div>
+                <div class="col">
+                  <q-input
+                    v-model="deducion.Description"
+                    :rules="[val => !!val || 'Campo requerido']"
+                    label="Description"
+                  />
+                </div>
+                <div class="col">
+                  <q-input
+                    v-model="deducion.value"
+                    type="number"
+                    :rules="[val => !!val || 'Campo requerido']"
+                    label="Porcentaje"
                   />
                 </div>
                 <div class="col">
@@ -25,20 +40,10 @@
                   :rules="[val => !!val || 'Campo requerido']"
                   v-model="deducion.SalaryDependent"
                   :options="SalaryDependents"
-                  option-value="id"
-                  option-label="SalaryDependent"
+                  option-value="value"
+                  option-label="label"
                   label="Salary Dependent"
                 />
-                </div>
-                <div class="col">
-                  <q-select
-                    :rules="[val => !!val || 'Campo requerido']"
-                    v-model="deducion.Estado"
-                    :options="Estados"
-                    option-value="id"
-                    option-label="Estado"
-                    label="Estado"
-                  />
                 </div>
             </div>
           </q-form>
@@ -54,35 +59,47 @@
 <script>
 import axios from "axios";
 import deducionesAPI from "../../../api/deducionesAPI";
+import Vue from 'vue';
+import x2js from 'x2js'; //xml data processing plugin
+Vue.prototype.$x2js = new x2js(); //Global method mount
 export default {
   components: {},
   data() {
     return {
         deducion: {
-            Nombre: "",
+            Title: "",
+            Description: "",
+            value: 0,
             SalaryDependent: "",
-            Estado: "",
         },
-        Estados: ["Activo", "Inactivo"],
-        SalaryDependents: ["si", "no"],
+        SalaryDependents: [{label:"si", value:true}, {label: "no", value:false}],
         modalCreate: false,
         data: []
     };
   },
   async created() {
-    this.getTipos();
+    this.getTiposDeduciones();
   },
   methods: {
     async getTiposDeduciones() {
-      this.data = await deducionesAPI.getTiposDeduciones();
+      let hola = await deducionesAPI.getDeduciones();
+      this.convertXml2JSon(hola.data);
+    },
+    convertXml2JSon(xml) {
+      var jsonObjt = this.$x2js.xml2js(xml);//res (xml data)
+      // console.log(jsonObjt.Envelope.Body);
+      let data = jsonObjt.Envelope.Body.Listar_Ing_DedResponse.Listar_Ing_DedResult.EntryType;
+      
+      if (Array.isArray(data)) {
+        this.data = data;
+      }else{
+        this.data.push(data);
+      }
     },
     async savededucion() {
       if (this.deducion) {
         await deducionesAPI.create(this.deducion).then(response => {
-          if (response.data.status == 0) {
-            this.triggerWarning();
-          }
-          if (response.data.status == 1) {
+          if (response.status == 200) {
             this.triggerPositive();
             setTimeout(this.loadOnce, 1000);
           } else {
@@ -118,9 +135,9 @@ export default {
     },
     cleamImpus() {
       this.modalCreate = false;
-      this.deducion.Nombre = "";
-      this.deducion.SalaryDependent = "";
-      this.deducion.Estado = "";
+      this.ingreso.Title = "";
+      this.ingreso.Description = "";
+      this.ingreso.SalaryDependent = "";
     },
     agregardeducion() {
       this.modalCreate = true;

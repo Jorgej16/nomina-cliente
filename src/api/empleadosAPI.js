@@ -10,11 +10,11 @@ export default {
               <soap:Body>
                 <Crear_Empleado xmlns="https://github.com/alfredo00sd/">
                   <employee>
-                    <Nomina>${14}</Nomina>
+                    <Nomina>${empleado.nomina}</Nomina>
                     <Cedula>${empleado.cedula}</Cedula>
-                    <DepartamentId>${22}</DepartamentId>
+                    <DepartamentId>${empleado.Departamento.Id}</DepartamentId>
                     <Name>${empleado.nombre}</Name>
-                    <LastName>${empleado.nombre}</LastName>
+                    <LastName>${empleado.apellido}</LastName>
                     <WorkPosition>${empleado.Puesto}</WorkPosition>
                     <Salary>${empleado.Salario}</Salary>
                   </employee>
@@ -22,7 +22,7 @@ export default {
               </soap:Body>
             </soap:Envelope>`;
 
-    let response = await axios.post(`https://localhost:44350/GestionNomina.asmx`, 
+    let response = await axios.post(`https://reto2propietaria20201109165745.azurewebsites.net/GestionNomina.asmx`, 
                   xmls,
                   {headers:
                     {'Content-Type': 'text/xml',
@@ -40,7 +40,7 @@ export default {
       </soap:Body>
     </soap:Envelope>`;
 
-    let response = await axios.post(`https://localhost:44350/GestionNomina.asmx`, 
+    let response = await axios.post(`https://reto2propietaria20201109165745.azurewebsites.net/GestionNomina.asmx`, 
                   xmls,
                   {headers:
                     {'Content-Type': 'text/xml',
@@ -49,5 +49,21 @@ export default {
 
     return response;
   },
-  
+  async getDepartamentos() {
+    let xmls=`<?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <Listar_Departamentos xmlns="https://github.com/alfredo00sd/" />
+      </soap:Body>
+    </soap:Envelope>`;
+
+    let response = await axios.post(`https://reto2propietaria20201109165745.azurewebsites.net/GestionAdmin.asmx`, 
+                  xmls,
+                  {headers:
+                    {'Content-Type': 'text/xml',
+                  'Accept': 'text/xml'}
+                  });
+
+    return response;
+  },
 }

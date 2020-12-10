@@ -5,9 +5,7 @@
         <DeducionesCreate />
       </q-card-section>
     </q-card>
-    <q-card class="card">
         <DeducionesList />
-    </q-card>
   </div>
 </template>
 

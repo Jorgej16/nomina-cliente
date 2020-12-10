@@ -5,9 +5,7 @@
         <IngresosCreate />
       </q-card-section>
     </q-card>
-    <q-card class="card">
         <IngresosList />
-    </q-card>
   </div>
 </template>
 

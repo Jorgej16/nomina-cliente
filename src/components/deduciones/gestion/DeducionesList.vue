@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <q-table title="TIPOS DE DEDUCIONES" :data="data" :columns="columns" row-key="cedula" :filter="filter">
+    <q-table title="TIPOS DE DEDUCIONES" :data="data" :columns="columns" row-key="Title" :filter="filter">
       <template v-slot:top-right>
         <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
           <template v-slot:append>
@@ -78,9 +78,24 @@
             <div class="q-gutter-md">
               <div class="col">
                   <q-input
-                    v-model="CurrentTipoDeducion.Nombre"
+                    v-model="CurrentTipoDeducion.Title"
                     :rules="[val => !!val || 'Campo requerido']"
-                    label="Nombre"
+                    label="Titulo"
+                  />
+                </div>
+              <div class="col">
+                  <q-input
+                    v-model="CurrentTipoDeducion.Description"
+                    :rules="[val => !!val || 'Campo requerido']"
+                    label="Description"
+                  />
+                </div>
+                <div class="col">
+                  <q-input
+                    v-model="CurrentTipoDeducion.value"
+                    type="number"
+                    :rules="[val => !!val || 'Campo requerido']"
+                    label="Porcentaje"
                   />
                 </div>
                 <div class="col">
@@ -88,20 +103,10 @@
                   :rules="[val => !!val || 'Campo requerido']"
                   v-model="CurrentTipoDeducion.SalaryDependent"
                   :options="SalaryDependents"
-                  option-value="id"
-                  option-label="SalaryDependent"
+                  option-value="value"
+                  option-label="label"
                   label="SalaryDependent"
                 />
-                </div>
-                <div class="col">
-                  <q-select
-                    :rules="[val => !!val || 'Campo requerido']"
-                    v-model="CurrentTipoDeducion.Estado"
-                    :options="Estados"
-                    option-value="id"
-                    option-label="Estado"
-                    label="Estado"
-                  />
                 </div>
             </div>
           </q-form>
@@ -118,18 +123,35 @@
 <script>
 import axios from "axios";
 import deducionesAPI from "../../../api/deducionesAPI";
+import Vue from 'vue';
+import x2js from 'x2js'; //xml data processing plugin
+Vue.prototype.$x2js = new x2js(); //Global method mount
 export default {
   data() {
     return {
       filter: "",
       columns: [
         {
-          name: "nombre",
+          name: "Title",
           required: true,
-          label: "Nombre",
+          label: "Titulo",
           align: "left",
-          field: row => row.nombre,
+          field: row => row.Title,
           format: val => `${val}`,
+          sortable: true
+        },
+        {
+          name: "Description",
+          align: "left",
+          label: "Description",
+          field: "Description",
+          sortable: true
+        },
+        {
+          name: "Value",
+          align: "left",
+          label: "Porcentaje",
+          field: "Value",
           sortable: true
         },
         {
@@ -139,19 +161,12 @@ export default {
           field: "SalaryDependent",
           sortable: true
         },
-        {
-          name: "Estado",
-          align: "left",
-          label: "Estado",
-          field: "Estado",
-          sortable: true
-        },
       ],
       data: [],
       CurrentId: null,
       CurrentTipoDeducion: [],
         Estados: ["Activo", "Inactivo"],
-        SalaryDependents: ["contablidad", "ninguno"],
+        SalaryDependents: [{label:"si", value:true}, {label: "no", value:false}],
       modalUpdate: false,
     };
   },
@@ -160,7 +175,19 @@ export default {
   },
   methods: {
     async getDeduciones() {
-      this.data = await deducionesAPI.getDeduciones();
+      let hola = await deducionesAPI.getDeduciones();
+      this.convertXml2JSon(hola.data);
+    },
+    convertXml2JSon(xml) {
+      var jsonObjt = this.$x2js.xml2js(xml);//res (xml data)
+      let data = jsonObjt.Envelope.Body.Listar_Ing_DedResponse.Listar_Ing_DedResult.EntryType;
+      
+      if (Array.isArray(data)) {
+        this.data = data;
+      }else{
+        this.data.push(data);
+      }
+      console.log(this.data);
     },
     updateIngresosShow(deduciones) {
       this.CurrentTipoDeducion = deduciones;

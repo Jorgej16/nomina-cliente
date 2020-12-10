@@ -151,7 +151,6 @@
 import axios from "axios";
 import EmpleadosAPI from "../../../api/empleadosAPI";
 import Vue from 'vue';
-// import parser from 'xml2json';
 import x2js from 'x2js'; //xml data processing plugin
 Vue.prototype.$x2js = new x2js(); //Global method mount
 export default {
@@ -214,15 +213,17 @@ export default {
   methods: {
     async getEmpleados() {
       let hola = await EmpleadosAPI.getEmpleados();
-      console.log(hola);
       this.convertXml2JSon(hola.data);
     },
     convertXml2JSon(xml) {
       var jsonObjt = this.$x2js.xml2js(xml);//res (xml data)
       let data = jsonObjt.Envelope.Body.Listar_EmpleadosResponse.Listar_EmpleadosResult.Employee;
-      this.data = data;
-      console.log(this.data);
-      // console.log(jsonObjt.Envelope.Body.Listar_EmpleadosResponse.Listar_EmpleadosResult); 
+      
+      if (Array.isArray(data)) {
+        this.data = data;
+      }else{
+        this.data.push(data);
+      }
     },
     updateEmpleadoShow(empleado) {
       this.CurrentEmpleado = empleado;
