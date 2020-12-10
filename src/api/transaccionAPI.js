@@ -58,8 +58,8 @@ export default {
     <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
       <soap:Body>
         <Enviar_asiento_contable xmlns="https://github.com/alfredo00sd/">
-          <desde>2020-12-01</desde>
-          <hasta>2020-12-31</hasta>
+          <desde>string</desde>
+          <hasta>string</hasta>
         </Enviar_asiento_contable>
       </soap:Body>
     </soap:Envelope>`;

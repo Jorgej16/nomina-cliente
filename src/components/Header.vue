@@ -6,7 +6,7 @@
           <!-- <q-avatar>
             <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
           </q-avatar> -->
-          {{saludo}}, {{$attrs.empleado.nombre}}
+          GESTION DE NOMINA
         </q-toolbar-title>
       <q-btn-dropdown
         flat
