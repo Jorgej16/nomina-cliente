@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <q-table title="ASIENTOS CONTABLES" :data="data" :columns="columns" row-key="cedula" :filter="filter">
+    <q-table title="ASIENTOS CONTABLES" :data="asientos" :columns="columns" row-key="cedula" :filter="filter">
       <template v-slot:top-right>
         <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
           <template v-slot:append>
@@ -27,6 +27,8 @@
 <script>
 import axios from "axios";
 import TransaccionAPI from "../../../api/transaccionAPI";
+import moment from "moment";
+// import json from "../../../api/asiento.json"
 import Vue from 'vue';
 import x2js from 'x2js'; //xml data processing plugin
 Vue.prototype.$x2js = new x2js(); //Global method mount
@@ -36,58 +38,71 @@ export default {
       filter: "",  
       columns: [
         {
-          name: "Cedula",
+          name: "auxiliar",
           align: "left",
-          label: "Cedula",
-          field: "Cedula",
+          label: "auxiliar",
+          field: "auxiliar",
           sortable: true
         },
         {
-          name: "EntryDetails",
+          name: "cuenta",
           align: "left",
-          label: "Ingreso",
-          field: "EntryDetails",
+          label: "cuenta",
+          field: "cuenta",
           sortable: true
         },
         {
-          name: "DeductionDetails",
+          name: "noAsiento",
           align: "left",
-          label: "Deduccion",
-          field: "DeductionDetails",
+          label: "no Asiento",
+          field: "noAsiento",
           sortable: true
         },
         {
-          name: "TranscType",
+          name: "descripcionCuenta",
           align: "left",
-          label: "Tipo",
-          field: "TranscType",
+          label: "descripcion",
+          field: "descripcionCuenta",
           sortable: true
         },
         {
-          name: "Amount",
+          name: "tipoMovimiento",
           align: "left",
-          label: "Monto",
-          field: "Amount",
+          label: "tipo Movimiento",
+          field: "tipoMovimiento",
           sortable: true
         },
         {
-          name: "Date",
+          name: "fecha",
           align: "left",
-          label: "Fecha",
-          field: "Date",
+          label: "fecha",
+          field: "fecha",
+          sortable: true,
+          format: (val) => this.formatDate(val),
+        },
+        {
+          name: "estado",
+          align: "left",
+          label: "estado",
+          field: "estado",
           sortable: true
         },
-        { name: "State", label: "Estado", field: "State", 
+        { name: "moneda", label: "moneda", field: "moneda", 
           align: "left", sortable: true }
       ],
       data: [],
+      asientos: [],
       CurrentId: null,
     };
   },
   async created() {
     this.getAsientos();
+    // this.asientos = json;
   },
   methods: {
+      formatDate(date) {
+        return moment(date).format('MM-DD-YYYY hh:mm A');
+      },
     async getAsientos() {
       let hola = await TransaccionAPI.getAsientos();
       this.convertXml2JSon(hola.data);
@@ -101,7 +116,8 @@ export default {
       }else{
         this.data.push(data);
       }
-      console.log(this.data);
+      var obj = JSON.parse(this.data[0]);
+      this.asientos = obj;
     },
   }
 };
